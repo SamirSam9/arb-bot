@@ -12,7 +12,7 @@ from web3.middleware import geth_poa_middleware
 from telegram import Bot
 
 # ========== CONFIG (ENV) ==========
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+TELEGRAM_TOKEN = os.environ.get("8357095924:AAGlQqmTob37if_ZbnRs4JXdWmdgiIpqZpU")
 CHAT_ID = int(os.environ.get("CHAT_ID", "5009858379"))
 BYBIT_KEY = os.environ.get("BYBIT_KEY")
 BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
