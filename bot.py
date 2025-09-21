@@ -1,6 +1,7 @@
 import os
 import time
 import asyncio
+import ccxt
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Tuple, List
@@ -77,7 +78,22 @@ def make_client(id_name: str, key: Optional[str], secret: Optional[str]):
     if id_name == "bitget":
         return ccxt.bitget(params)
     raise ValueError("unknown exchange")
+BYBIT_KEY = os.environ.get("BYBIT_KEY")
+BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
+MEXC_KEY = os.environ.get("MEXC_KEY")
+MEXC_SECRET = os.environ.get("MEXC_SECRET")
+BITGET_KEY = os.environ.get("BITGET_KEY")
+BITGET_SECRET = os.environ.get("BITGET_SECRET")
 
+if not (BYBIT_KEY and BYBIT_SECRET and MEXC_KEY and MEXC_SECRET and BITGET_KEY and BITGET_SECRET):
+    raise ValueError("One or more exchange API keys/secrets are not set!")
+def make_client(exchange_name, api_key, api_secret):
+    exchange_class = getattr(ccxt, exchange_name)
+    return exchange_class({
+        'apiKey': api_key,
+        'secret': api_secret,
+        'enableRateLimit': True,
+    })
 EXCHANGES = {
     "bybit": make_client("bybit", BYBIT_KEY, BYBIT_SECRET),
     "mexc": make_client("mexc", MEXC_KEY, MEXC_SECRET),
