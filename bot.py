@@ -50,6 +50,10 @@ COINGECKO_IDS_OVERRIDE = {"TRUMP": "maga"}
 # ========== LOGGING & BOT ==========
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger("arb-bot")
+import os
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+if not TELEGRAM_TOKEN:
+    raise ValueError("TELEGRAM_TOKEN is not set in environment variables!")
 bot = Bot(token=TELEGRAM_TOKEN)
 
 # ========== EXCHANGES & WEB3 ==========
