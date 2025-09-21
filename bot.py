@@ -6,7 +6,16 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Tuple, List
 from itertools import combinations
 import aiohttp
-import ccxt.async_support as ccxt
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+# Фиктивный сервер на порту 10000
+def run_server():
+    server = HTTPServer(('', 10000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+import threading
+threading.Thread(target=run_server, daemon=True).start()
+import ccxt.async_support as ccxtgit 
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 from telegram import Bot
