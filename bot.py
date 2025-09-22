@@ -9,7 +9,7 @@ from itertools import combinations
 import aiohttp
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-# Фиктивный сервер на порту 10000
+# Фиктивный сервер на порту 10000 для Render Web Service
 def run_server():
     server = HTTPServer(('', 10000), SimpleHTTPRequestHandler)
     server.serve_forever()
@@ -22,14 +22,14 @@ from web3.middleware import geth_poa_middleware
 from telegram import Bot
 
 # ========== CONFIG (ENV) ==========
-TELEGRAM_TOKEN = os.environ.get("8357095924:AAGlQqmTob37if_ZbnRs4JXdWmdgiIpqZpU")
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # Уже активен
 CHAT_ID = int(os.environ.get("CHAT_ID", "5009858379"))
-BYBIT_KEY = os.environ.get("BYBIT_KEY")
-BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
-MEXC_KEY = os.environ.get("MEXC_KEY")
-MEXC_SECRET = os.environ.get("MEXC_SECRET")
-BITGET_KEY = os.environ.get("BITGET_KEY")
-BITGET_SECRET = os.environ.get("BITGET_SECRET")
+BYBIT_KEY = os.environ.get("BYBIT_KEY", "FH8adJ1udxzCpm49r1")
+BYBIT_SECRET = os.environ.get("BYBIT_SECRET", "your_bybit_api_secret")
+MEXC_KEY = os.environ.get("MEXC_KEY", "mx0vglszjOH7FJdFIb")
+MEXC_SECRET = os.environ.get("MEXC_SECRET", "your_mexc_api_secret")
+BITGET_KEY = os.environ.get("BITGET_KEY", "bg_67eee458caa2e940880b61dd0e05a8a7")
+BITGET_SECRET = os.environ.get("BITGET_SECRET", "your_bitget_api_secret")
 MIN_VOLUME = float(os.environ.get("MIN_VOLUME", 500000))
 MIN_SPREAD_PERCENT = float(os.environ.get("MIN_SPREAD_PERCENT", 2.0))
 MIN_PROFIT_USD = float(os.environ.get("MIN_PROFIT_USD", 0.5))
@@ -53,20 +53,19 @@ ETH_GWEI_FALLBACK = float(os.environ.get("ETH_GWEI_FALLBACK", 30.0))
 BNB_GWEI_FALLBACK = float(os.environ.get("BNB_GWEI_FALLBACK", 5.0))
 ETH_PRICE_FALLBACK = float(os.environ.get("ETH_PRICE_FALLBACK", 4619.0))
 BNB_PRICE_FALLBACK = float(os.environ.get("BNB_PRICE_FALLBACK", 550.0))
-ETHERSCAN_KEY = os.environ.get("ETHERSCAN_KEY")
-BSCSCAN_KEY = os.environ.get("BSCSCAN_KEY")
+# Раскомментируй, если нужны точные газы (опционально)
+# ETHERSCAN_KEY = os.environ.get("ETHERSCAN_KEY")
+# BSCSCAN_KEY = os.environ.get("BSCSCAN_KEY")
 COINGECKO_IDS_OVERRIDE = {"TRUMP": "maga"}
 
 # ========== LOGGING & BOT ==========
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger("arb-bot")
-import os
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 if not TELEGRAM_TOKEN:
     raise ValueError("TELEGRAM_TOKEN is not set in environment variables!")
 bot = Bot(token=TELEGRAM_TOKEN)
 
-# ========== EXCHANGES & WEB3 ==========
+# ========== EXCHANGES & WEB3 =========
 def make_client(id_name: str, key: Optional[str], secret: Optional[str]):
     params = {"enableRateLimit": True}
     if key and secret:
@@ -78,26 +77,26 @@ def make_client(id_name: str, key: Optional[str], secret: Optional[str]):
     if id_name == "bitget":
         return ccxt.bitget(params)
     raise ValueError("unknown exchange")
-BYBIT_KEY = os.environ.get("BYBIT_KEY")
-BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
-MEXC_KEY = os.environ.get("MEXC_KEY")
-MEXC_SECRET = os.environ.get("MEXC_SECRET")
-BITGET_KEY = os.environ.get("BITGET_KEY")
-BITGET_SECRET = os.environ.get("BITGET_SECRET")
 
-if not (BYBIT_KEY and BYBIT_SECRET and MEXC_KEY and MEXC_SECRET and BITGET_KEY and BITGET_SECRET):
-    raise ValueError("One or more exchange API keys/secrets are not set!")
-def make_client(exchange_name, api_key, api_secret):
-    exchange_class = getattr(ccxt, exchange_name)
-    return exchange_class({
-        'apiKey': api_key,
-        'secret': api_secret,
-        'enableRateLimit': True,
-    })
+# BYBIT_KEY = os.environ.get("BYBIT_KEY")
+# BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
+# MEXC_KEY = os.environ.get("MEXC_KEY")
+# MEXC_SECRET = os.environ.get("MEXC_SECRET")
+# BITGET_KEY = os.environ.get("BITGET_KEY")
+# BITGET_SECRET = os.environ.get("BITGET_SECRET")
+#
+# if not (BYBIT_KEY and BYBIT_SECRET and MEXC_KEY and MEXC_SECRET and BITGET_KEY and BITGET_SECRET):
+#     raise ValueError("One or more exchange API keys/secrets are not set!")
+# EXCHANGES = {
+#     "bybit": make_client("bybit", BYBIT_KEY, BYBIT_SECRET),
+#     "mexc": make_client("mexc", MEXC_KEY, MEXC_SECRET),
+#     "bitget": make_client("bitget", BITGET_KEY, BITGET_SECRET),
+# }
+# Без ключей используем публичные данные (ограничено для фьючерсов)
 EXCHANGES = {
-    "bybit": make_client("bybit", BYBIT_KEY, BYBIT_SECRET),
-    "mexc": make_client("mexc", MEXC_KEY, MEXC_SECRET),
-    "bitget": make_client("bitget", BITGET_KEY, BITGET_SECRET),
+    "bybit": ccxt.bybit({"enableRateLimit": True}),
+    "mexc": ccxt.mexc({"enableRateLimit": True}),
+    "bitget": ccxt.bitget({"enableRateLimit": True}),
 }
 w3_eth = Web3(Web3.HTTPProvider(ETH_RPC))
 w3_bsc = Web3(Web3.HTTPProvider(BSC_RPC))
@@ -130,7 +129,7 @@ SIGNALS_24H = 0
 LAST_RESET = datetime.now()
 LAST_GAS_UPDATE = 0
 GAS_FEES_USD = {"ETH": None, "BNB": None}
-MIN_SPREAD = MIN_SPREAD_PERCENT
+MIN_SPREAD = MIN_SPREAD_PERCENT  # Фиксируем на MIN_SPREAD_PERCENT
 
 # ========== HELPERS ==========
 def pct(a: float, b: float) -> Optional[float]:
@@ -169,12 +168,9 @@ async def update_min_spread():
     if now - LAST_RESET > timedelta(hours=24):
         SIGNALS_24H = 0
         LAST_RESET = now
-    if SIGNALS_24H < 1:
-        MIN_SPREAD = max(1.0, MIN_SPREAD - 0.5)
-        logger.info(f"Adaptive spread down to {MIN_SPREAD}% (no signals)")
-    elif SIGNALS_24H > 10:
-        MIN_SPREAD = min(3.0, MIN_SPREAD + 0.5)
-        logger.info(f"Adaptive spread up to {MIN_SPREAD}% (too many)")
+    # Отключаем адаптивность, фиксируем MIN_SPREAD на MIN_SPREAD_PERCENT
+    MIN_SPREAD = MIN_SPREAD_PERCENT
+    logger.info(f"Min spread fixed at {MIN_SPREAD}%")
 
 async def init_coingecko(session: aiohttp.ClientSession):
     global COINGECKO_SYMBOL_TO_ID
@@ -280,18 +276,18 @@ async def update_gas_fees(session: aiohttp.ClientSession):
                 data = await r.json()
                 eth_price = data.get("ethereum", {}).get("usd", ETH_PRICE_FALLBACK)
                 bnb_price = data.get("binancecoin", {}).get("usd", BNB_PRICE_FALLBACK)
-        url = f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={ETHERSCAN_KEY}" if ETHERSCAN_KEY else "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
-        async with session.get(url, timeout=15) as r:
-            if r.status == 200:
-                jd = await r.json()
-                if jd.get("status") == "1":
-                    eth_gwei = float(jd["result"]["SafeGasPrice"])
-        url2 = f"https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey={BSCSCAN_KEY}" if BSCSCAN_KEY else "https://api.bscscan.com/api?module=gastracker&action=gasoracle"
-        async with session.get(url2, timeout=15) as r:
-            if r.status == 200:
-                jd = await r.json()
-                if jd.get("status") == "1":
-                    bnb_gwei = float(jd["result"]["SafeGasPrice"])
+        # url = f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={ETHERSCAN_KEY}" if ETHERSCAN_KEY else "https://api.etherscan.io/api?module=gastracker&action=gasoracle"
+        # async with session.get(url, timeout=15) as r:
+        #     if r.status == 200:
+        #         jd = await r.json()
+        #         if jd.get("status") == "1":
+        #             eth_gwei = float(jd["result"]["SafeGasPrice"])
+        # url2 = f"https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey={BSCSCAN_KEY}" if BSCSCAN_KEY else "https://api.bscscan.com/api?module=gastracker&action=gasoracle"
+        # async with session.get(url2, timeout=15) as r:
+        #     if r.status == 200:
+        #         jd = await r.json()
+        #         if jd.get("status") == "1":
+        #             bnb_gwei = float(jd["result"]["SafeGasPrice"])
     except Exception as e:
         logger.debug(f"Gas update failed: {e}")
     eth_gwei = eth_gwei or ETH_GWEI_FALLBACK
@@ -307,8 +303,10 @@ async def build_tickers_snapshot() -> Dict[str, Dict[str, dict]]:
     out: Dict[str, Dict[str, dict]] = {}
     for name, client in EXCHANGES.items():
         try:
-            tks = await client.fetch_tickers()
-            out[name] = {s: t for s, t in tks.items() if s.endswith("/USDT")}
+            # Поддержка спотов и фьючерсов
+            tks = await client.fetch_tickers(params={"type": "spot"})  # Спот
+            futs = await client.fetch_tickers(params={"type": "future"})  # Фьючерсы
+            out[name] = {**{s: t for s, t in tks.items() if s.endswith("/USDT")}, **{s: t for s, t in futs.items() if s.endswith(":USDT")}}
             await asyncio.sleep(0.2)
         except Exception as e:
             logger.debug(f"fetch_tickers {name} error: {e}")
@@ -320,7 +318,7 @@ async def build_funding_snapshot() -> Dict[str, dict]:
     for name, client in EXCHANGES.items():
         try:
             if client.has.get("fetchFundingRates"):
-                rates = await client.fetch_funding_rates()
+                rates = await client.fetch_funding_rates(params={"type": "future"})
                 if not rates or len(rates) < 10:
                     logger.debug(f"Low/no funding rates for {name}, skip")
                     continue
@@ -382,7 +380,7 @@ async def check_cex_cex(tickers_by_ex: Dict[str, Dict[str, dict]]):
             await asyncio.sleep(0.25)
 
 async def check_funding():
-    logger.info("Checking FUNDING arb")
+    logger.info("Checking FUNDING arb (priority)")
     funding = await build_funding_snapshot()
     if not funding:
         return
@@ -433,7 +431,7 @@ async def check_funding():
                     continue
 
 async def check_cex_dex(tickers_by_ex: Dict[str, Dict[str, dict]], session: aiohttp.ClientSession):
-    logger.info("Checking CEX-DEX")
+    logger.info("Checking CEX-DEX (priority)")
     candidates = {}
     for ex_name, tdict in tickers_by_ex.items():
         for sym, t in tdict.items():
@@ -482,10 +480,11 @@ async def main():
                     await update_gas_fees(session)
                     last_gas = time.time()
                 tickers = await build_tickers_snapshot()
+                # Приоритет: FUNDING, CEX-DEX, потом CEX-CEX
                 await asyncio.gather(
-                    check_cex_cex(tickers),
-                    check_funding(),
-                    check_cex_dex(tickers, session),
+                    check_funding(),  # Фьючерсы — первый приоритет
+                    check_cex_dex(tickers, session),  # CEX-DEX — второй приоритет
+                    check_cex_cex(tickers),  # CEX-CEX — третий
                 )
             except Exception as e:
                 logger.error(f"Main loop error: {e}")
