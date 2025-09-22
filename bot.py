@@ -25,11 +25,8 @@ from telegram import Bot
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # Уже активен
 CHAT_ID = int(os.environ.get("CHAT_ID", "5009858379"))
 BYBIT_KEY = os.environ.get("BYBIT_KEY", "FH8adJ1udxzCpm49r1")
-BYBIT_SECRET = os.environ.get("BYBIT_SECRET", "your_bybit_api_secret")
 MEXC_KEY = os.environ.get("MEXC_KEY", "mx0vglszjOH7FJdFIb")
-MEXC_SECRET = os.environ.get("MEXC_SECRET", "your_mexc_api_secret")
 BITGET_KEY = os.environ.get("BITGET_KEY", "bg_67eee458caa2e940880b61dd0e05a8a7")
-BITGET_SECRET = os.environ.get("BITGET_SECRET", "your_bitget_api_secret")
 MIN_VOLUME = float(os.environ.get("MIN_VOLUME", 500000))
 MIN_SPREAD_PERCENT = float(os.environ.get("MIN_SPREAD_PERCENT", 2.0))
 MIN_PROFIT_USD = float(os.environ.get("MIN_PROFIT_USD", 0.5))
