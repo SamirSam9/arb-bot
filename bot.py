@@ -77,27 +77,27 @@ def make_client(id_name: str, key: Optional[str], secret: Optional[str]):
     if id_name == "bitget":
         return ccxt.bitget(params)
     raise ValueError("unknown exchange")
+# Раскомментируй следующие строки
+BYBIT_KEY = os.environ.get("BYBIT_KEY")
+BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
+MEXC_KEY = os.environ.get("MEXC_KEY")
+MEXC_SECRET = os.environ.get("MEXC_SECRET")
+BITGET_KEY = os.environ.get("BITGET_KEY")
+BITGET_SECRET = os.environ.get("BITGET_SECRET")
 
-# BYBIT_KEY = os.environ.get("BYBIT_KEY")
-# BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
-# MEXC_KEY = os.environ.get("MEXC_KEY")
-# MEXC_SECRET = os.environ.get("MEXC_SECRET")
-# BITGET_KEY = os.environ.get("BITGET_KEY")
-# BITGET_SECRET = os.environ.get("BITGET_SECRET")
-#
-# if not (BYBIT_KEY and BYBIT_SECRET and MEXC_KEY and MEXC_SECRET and BITGET_KEY and BITGET_SECRET):
-#     raise ValueError("One or more exchange API keys/secrets are not set!")
-# EXCHANGES = {
-#     "bybit": make_client("bybit", BYBIT_KEY, BYBIT_SECRET),
-#     "mexc": make_client("mexc", MEXC_KEY, MEXC_SECRET),
-#     "bitget": make_client("bitget", BITGET_KEY, BITGET_SECRET),
-# }
-# Без ключей используем публичные данные (ограничено для фьючерсов)
+if not (BYBIT_KEY and BYBIT_SECRET and MEXC_KEY and MEXC_SECRET and BITGET_KEY and BITGET_SECRET):
+    raise ValueError("One or more exchange API keys/secrets are not set!")
 EXCHANGES = {
-    "bybit": ccxt.bybit({"enableRateLimit": True}),
-    "mexc": ccxt.mexc({"enableRateLimit": True}),
-    "bitget": ccxt.bitget({"enableRateLimit": True}),
+    "bybit": make_client("bybit", BYBIT_KEY, BYBIT_SECRET),
+    "mexc": make_client("mexc", MEXC_KEY, MEXC_SECRET),
+    "bitget": make_client("bitget", BITGET_KEY, BITGET_SECRET),
 }
+# Комментируем публичный вариант
+# EXCHANGES = {
+#     "bybit": ccxt.bybit({"enableRateLimit": True}),
+#     "mexc": ccxt.mexc({"enableRateLimit": True}),
+#     "bitget": ccxt.bitget({"enableRateLimit": True}),
+# }
 w3_eth = Web3(Web3.HTTPProvider(ETH_RPC))
 w3_bsc = Web3(Web3.HTTPProvider(BSC_RPC))
 try:
@@ -130,7 +130,6 @@ LAST_RESET = datetime.now()
 LAST_GAS_UPDATE = 0
 GAS_FEES_USD = {"ETH": None, "BNB": None}
 MIN_SPREAD = MIN_SPREAD_PERCENT  # Фиксируем на MIN_SPREAD_PERCENT
-
 # ========== HELPERS ==========
 def pct(a: float, b: float) -> Optional[float]:
     if a is None or b is None or (a + b) == 0:
