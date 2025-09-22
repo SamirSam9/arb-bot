@@ -76,18 +76,15 @@ def make_client(id_name: str, key: Optional[str], secret: Optional[str]):
     raise ValueError("unknown exchange")
 # Раскомментируй следующие строки
 BYBIT_KEY = os.environ.get("BYBIT_KEY")
-BYBIT_SECRET = os.environ.get("BYBIT_SECRET")
 MEXC_KEY = os.environ.get("MEXC_KEY")
-MEXC_SECRET = os.environ.get("MEXC_SECRET")
 BITGET_KEY = os.environ.get("BITGET_KEY")
-BITGET_SECRET = os.environ.get("BITGET_SECRET")
 
-if not (BYBIT_KEY and BYBIT_SECRET and MEXC_KEY and MEXC_SECRET and BITGET_KEY and BITGET_SECRET):
+if not (BYBIT_KEY and  MEXC_KEY and BITGET_KEY):
     raise ValueError("One or more exchange API keys/secrets are not set!")
 EXCHANGES = {
-    "bybit": make_client("bybit", BYBIT_KEY, BYBIT_SECRET),
-    "mexc": make_client("mexc", MEXC_KEY, MEXC_SECRET),
-    "bitget": make_client("bitget", BITGET_KEY, BITGET_SECRET),
+    "bybit": make_client("bybit", BYBIT_KEY, ),
+    "mexc": make_client("mexc", MEXC_KEY, ),
+    "bitget": make_client("bitget", BITGET_KEY, ),
 }
 # Комментируем публичный вариант
 # EXCHANGES = {
